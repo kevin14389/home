@@ -9,7 +9,13 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 L27 30 L5 30 Z' fill='%233B6D11'/%3E%3C/svg%3E">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
+  /* Safari 26 (iOS) ignore theme-color : il teinte les zones sous la barre d'état
+     et sous la barre d'outils avec le fond de la page ou d'un élément fixe au bord. */
+  html{background:#E6F1FB}
   body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .bord{position:fixed;left:0;right:0;height:6px;pointer-events:none;z-index:0}
+  .bord.haut{top:0;background:#E6F1FB}
+  .bord.bas{bottom:0;background:#639922}
   .scene{position:relative;min-height:100vh;min-height:100dvh;overflow:hidden;background:#E6F1FB}
   .stars{position:absolute;inset:0;opacity:0;pointer-events:none}
   /* Transitions activées seulement après le premier rendu (pas de fondu au chargement) */
@@ -141,6 +147,9 @@
     <g id="zzz" display="none" stroke="#E6F1FB" stroke-width="1.5" fill="none"><path d="M314 172 L322 172 L314 180 L322 180"/><path d="M326 160 L332 160 L326 166 L332 166"/><path d="M336 150 L340 150 L336 154 L340 154"/></g>
   </svg>
 </main>
+<!-- Bandes fixes invisibles : donnent à Safari la couleur du ciel (haut) et du sol (bas) -->
+<div class="bord haut" id="bordHaut" aria-hidden="true"></div>
+<div class="bord bas" id="bordBas" aria-hidden="true"></div>
 
 <script>
   // Adresse affichée : assemblée ici pour compliquer la vie des robots spammeurs
@@ -212,6 +221,10 @@
     const h = heure(), k = periode(Math.floor(h)), c = P[k], nuit = k === 'nuit';
     $('scene').style.backgroundColor = c.sky;
     document.querySelector('meta[name=theme-color]').setAttribute('content', c.sky);
+    // Teinte des barres Safari 26 : ciel en haut, sol en bas
+    document.documentElement.style.backgroundColor = c.sky;
+    $('bordHaut').style.backgroundColor = c.sky;
+    $('bordBas').style.backgroundColor = c.h2;
     ['h0','pf','h1','pm','h2','po','cA','cB','bB'].forEach(id => $(id).setAttribute('fill', c[id]));
     $('river').setAttribute('stroke', c.rv);
     document.querySelectorAll('.gl').forEach(e => e.setAttribute('fill', c.gl));
