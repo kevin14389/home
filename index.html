@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Delatte</title>
+<meta name="description" content="Vous êtes bien chez les Delatte.">
+<meta name="theme-color" content="#E6F1FB">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 L27 30 L5 30 Z' fill='%233B6D11'/%3E%3C/svg%3E">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .scene{position:relative;min-height:100vh;min-height:100dvh;overflow:hidden;background:#E6F1FB}
+  .stars{position:absolute;inset:0;opacity:0;pointer-events:none}
+  /* Transitions activées seulement après le premier rendu (pas de fondu au chargement) */
+  .scene.pret{transition:background-color .8s}
+  .scene.pret .stars{transition:opacity .8s}
+  .stars span{position:absolute;border-radius:50%;background:#B5D4F4}
+  /* overflow visible : le soleil et la lune peuvent monter dans le ciel au-dessus du dessin */
+  .paysage{position:absolute;left:0;bottom:0;width:100%;height:auto;display:block;overflow:visible}
+  .intro{position:relative;z-index:1;max-width:40rem;
+    padding:clamp(1.5rem,5vw,3.5rem);
+    padding-top:max(clamp(1.5rem,8vh,4rem),env(safe-area-inset-top));
+    padding-left:max(clamp(1.5rem,5vw,3.5rem),env(safe-area-inset-left))}
+  h1{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:400;font-size:clamp(2.2rem,min(7vw,9vh),4.2rem);line-height:1.05;text-wrap:balance}
+  .sub{margin-top:.6rem;font-size:clamp(1rem,2.2vw,1.2rem);line-height:1.45;text-wrap:pretty}
+  .mail{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.3rem;min-height:44px;padding:.55rem 1.2rem;border-radius:999px;border:1px solid;text-decoration:none;font-size:1rem;transition:transform .15s}
+  .mail:hover{transform:translateY(-1px)}
+  .mail svg{width:1.1em;height:1.1em}
+</style>
+</head>
+<body>
+<main class="scene" id="scene">
+  <div class="stars" id="stars"></div>
+
+  <div class="intro">
+    <h1 id="greet" lang="lb">Moien&#8239;!</h1>
+    <p class="sub" id="sub">Vous êtes bien chez les Delatte.</p>
+    <a class="mail" id="mail" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      <span id="mailtxt">bonjour [at] delatte.lu</span>
+    </a>
+  </div>
+
+  <svg class="paysage" viewBox="0 0 680 290" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <clipPath id="kc"><rect x="-16" y="32" width="32" height="28" rx="9"/></clipPath>
+      <g id="pine"><path d="M0 -24 L9 0 L-9 0 Z"/><path d="M0 -33 L7 -13 L-7 -13 Z"/></g>
+      <g id="oak"><rect x="-2" y="-10" width="4" height="12" fill="#633806"/><circle cx="0" cy="-20" r="13"/></g>
+      <pattern id="clad" width="4" height="10" patternUnits="userSpaceOnUse"><rect id="cA" width="4" height="10" fill="#BA7517"/><rect id="cB" x="3.3" width="0.7" height="10" fill="#854F0B"/></pattern>
+      <pattern id="batt" width="8" height="10" patternUnits="userSpaceOnUse"><rect width="8" height="10" fill="#2C2C2A"/><rect id="bB" width="1.6" height="10" fill="#D3D1C7"/></pattern>
+      <pattern id="pyj" width="7" height="10" patternUnits="userSpaceOnUse"><rect width="7" height="10" fill="#B5D4F4"/><rect width="2.5" height="10" fill="#85B7EB"/></pattern>
+    </defs>
+
+    <!-- Soleil / lune -->
+    <circle id="sun" cx="520" cy="60" r="24" fill="#FAC775"/>
+    <circle id="moonshade" cx="610" cy="54" r="20" fill="#042C53" opacity="0"/>
+
+    <!-- Collines et forêts -->
+    <path id="h0" d="M0 178 C100 155 200 162 300 172 C420 184 520 142 680 158 L680 290 L0 290 Z" fill="#C0DD97"/>
+    <g id="pf" fill="#97C459">
+      <use href="#pine" transform="translate(270,178) scale(0.55)"/><use href="#pine" transform="translate(286,180) scale(0.5)"/><use href="#pine" transform="translate(332,180) scale(0.55)"/><use href="#pine" transform="translate(350,182) scale(0.5)"/><use href="#pine" transform="translate(470,174) scale(0.55)"/><use href="#pine" transform="translate(488,170) scale(0.6)"/><use href="#pine" transform="translate(505,167) scale(0.5)"/><use href="#pine" transform="translate(558,161) scale(0.6)"/><use href="#pine" transform="translate(578,159) scale(0.55)"/><use href="#pine" transform="translate(624,158) scale(0.6)"/><use href="#pine" transform="translate(644,159) scale(0.5)"/><use href="#pine" transform="translate(664,161) scale(0.55)"/>
+    </g>
+    <path id="h1" d="M0 218 C120 192 230 202 330 214 C440 226 530 186 680 196 L680 290 L0 290 Z" fill="#97C459"/>
+    <g id="pm" fill="#3B6D11">
+      <use href="#pine" transform="translate(15,218) scale(0.8)"/><use href="#pine" transform="translate(38,214) scale(0.75)"/><use href="#pine" transform="translate(62,210) scale(0.85)"/><use href="#pine" transform="translate(88,206) scale(0.75)"/><use href="#pine" transform="translate(115,204) scale(0.8)"/><use href="#pine" transform="translate(150,204) scale(0.7)"/>
+      <use href="#pine" transform="translate(545,204) scale(0.85)"/><use href="#pine" transform="translate(570,202) scale(0.75)"/><use href="#pine" transform="translate(592,201) scale(0.85)"/><use href="#pine" transform="translate(615,200) scale(0.7)"/><use href="#pine" transform="translate(636,200) scale(0.8)"/><use href="#pine" transform="translate(656,200) scale(0.75)"/><use href="#pine" transform="translate(676,201) scale(0.85)"/>
+    </g>
+    <path id="river" d="M690 228 C630 236 600 224 545 234 C495 244 470 236 430 248 C400 257 385 262 365 272" stroke="#85B7EB" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <path id="h2" d="M0 262 C150 238 260 252 380 266 C500 280 580 246 680 255 L680 290 L0 290 Z" fill="#639922"/>
+    <g id="po" fill="#3B6D11"><use href="#oak" transform="translate(40,258)"/><use href="#oak" transform="translate(650,257)"/><use href="#oak" transform="translate(673,256) scale(0.85)"/></g>
+
+    <!-- La maison -->
+    <g>
+      <rect x="362" y="226" width="48" height="40" fill="#2C2C2A"/>
+      <rect x="364" y="238" width="44" height="28" fill="#2C2C2A" stroke="#444441" stroke-width="0.8"/>
+      <path d="M364 245 L408 245 M364 252 L408 252 M364 259 L408 259" stroke="#444441" stroke-width="0.6"/>
+      <g fill="#D3D1C7"><rect x="366" y="228" width="1.6" height="8"/><rect x="371" y="227" width="1.6" height="5"/><rect x="375" y="229" width="1.6" height="7"/><rect x="380" y="227" width="1.6" height="9"/><rect x="385" y="228" width="1.6" height="4"/><rect x="389" y="227" width="1.6" height="8"/><rect x="394" y="229" width="1.6" height="6"/><rect x="399" y="227" width="1.6" height="9"/><rect x="404" y="228" width="1.6" height="5"/></g>
+      <path d="M406 203 L524 203 L512 180 L410 180 Z" fill="#444441"/>
+      <rect x="466" y="184" width="40" height="15" fill="#2C2C2A"/>
+      <path d="M476 184 L476 199 M486 184 L486 199 M496 184 L496 199 M466 191.5 L506 191.5" stroke="#5F5E5A" stroke-width="0.6"/>
+      <rect x="448" y="170" width="3" height="12" fill="#B4B2A9"/><rect x="446.5" y="168" width="6" height="3" fill="#B4B2A9"/>
+      <rect x="405" y="201" width="120" height="3" fill="#2C2C2A"/>
+      <rect x="410" y="204" width="110" height="30" fill="url(#clad)"/>
+      <rect x="416" y="207" width="76" height="22" fill="#2C2C2A"/>
+      <rect class="gl" x="418" y="209" width="12" height="18" fill="#444441"/><rect class="gl" x="447" y="209" width="7" height="18" fill="#444441"/><rect class="gl" x="480" y="209" width="10" height="18" fill="#444441"/>
+      <path d="M434 209 L434 227 M442 209 L442 227 M431 214 L446 214 M431 222 L446 222 M459 209 L459 227 M467 209 L467 227 M475 209 L475 227 M455 214 L479 214 M455 222 L479 222" stroke="#BA7517" stroke-width="1.1"/>
+      <rect x="410" y="234" width="57" height="32" fill="url(#batt)"/>
+      <rect x="420" y="242" width="22" height="9" fill="#2C2C2A"/><rect class="gl" x="421.5" y="243.5" width="19" height="6" fill="#444441"/>
+      <rect x="466" y="234" width="20" height="32" fill="url(#clad)"/>
+      <rect x="470" y="238" width="11" height="28" fill="#2C2C2A"/>
+      <rect x="484" y="226" width="68" height="42" fill="url(#clad)"/>
+      <rect x="484" y="226" width="68" height="1.5" fill="#854F0B"/>
+      <rect x="518" y="244" width="27" height="13" fill="#2C2C2A"/><rect class="gl" x="519.5" y="245.5" width="24" height="10" fill="#444441"/>
+    </g>
+
+    <!-- Le sanglier (matin et soir) -->
+    <g id="boar" display="none" transform="translate(605,257) scale(0.8)" fill="#444441">
+      <rect x="-11" y="-6" width="4" height="7"/><rect x="-5" y="-6" width="4" height="7"/><rect x="5" y="-6" width="4" height="7"/><rect x="10" y="-6" width="4" height="7"/>
+      <ellipse cx="1" cy="-12" rx="16" ry="9"/><path d="M-11 -19 L-26 -11 L-27 -6 L-11 -5 Z"/><rect x="-30" y="-11" width="4" height="5" rx="1"/><path d="M-13 -20 L-10 -26 L-7 -19 Z"/><path d="M16 -15 q5 -2 3 3" stroke="#444441" stroke-width="1.5" fill="none"/><circle cx="-18" cy="-13" r="1.1" fill="#F1EFE8"/><path d="M-24 -7 L-22 -11" stroke="#F1EFE8" stroke-width="1.3"/>
+    </g>
+
+    <!-- Le fiston -->
+    <g transform="translate(235,195) scale(0.85)">
+      <rect x="-12" y="57" width="9" height="16" rx="2" fill="#185FA5"/><rect x="3" y="57" width="9" height="16" rx="2" fill="#185FA5"/>
+      <g clip-path="url(#kc)"><rect x="-16" y="32" width="32" height="28" fill="#fff"/><rect x="-16" y="38" width="32" height="5" fill="#97C459"/><rect x="-16" y="48" width="32" height="5" fill="#97C459"/></g>
+      <!-- Manches blanches à rayure verte : en vert uni, le bras disparaissait sur la colline -->
+      <g id="kdown"><line x1="-14" y1="38" x2="-21" y2="56" stroke="#fff" stroke-width="7" stroke-linecap="round"/><line x1="-17.2" y1="46.1" x2="-18.6" y2="49.7" stroke="#97C459" stroke-width="7"/><circle cx="-21" cy="58" r="3.5" fill="#F5C4B3"/></g>
+      <g id="kwave" display="none"><line x1="-14" y1="38" x2="-25" y2="21" stroke="#fff" stroke-width="7" stroke-linecap="round"/><line x1="-19" y1="30.3" x2="-21.2" y2="27" stroke="#97C459" stroke-width="7"/><circle cx="-26" cy="18" r="3.5" fill="#F5C4B3"/></g>
+      <rect x="-4" y="26" width="8" height="8" fill="#F5C4B3"/>
+      <circle cx="-15" cy="16" r="3" fill="#F5C4B3"/><circle cx="15" cy="16" r="3" fill="#F5C4B3"/>
+      <circle cx="0" cy="15" r="15" fill="#F5C4B3"/>
+      <path d="M-15 14 C-16 -2 -6 -6 0 -6 C8 -6 16 -2 15 14 C12 7 9 5 5 7 C1 4 -4 8 -8 6 C-11 7 -13 10 -15 14 Z" fill="#BA7517"/>
+      <g id="kopen"><circle cx="-5" cy="15" r="1.6" fill="#2C2C2A"/><circle cx="5" cy="15" r="1.6" fill="#2C2C2A"/></g>
+      <path id="kclosed" display="none" d="M-7 15 Q-5 17 -3 15 M3 15 Q5 17 7 15" stroke="#2C2C2A" stroke-width="1.3" fill="none"/>
+      <path d="M-6 20 Q0 27 6 20 Z" fill="#fff" stroke="#712B13" stroke-width="1"/>
+      <g id="kcap" display="none"><path d="M-15 8 L15 8 C13 -4 8 -12 22 -18 C2 -16 -12 -8 -15 8 Z" fill="#7F77DD"/><rect x="-16" y="5" width="32" height="5" rx="2.5" fill="#fff"/><circle cx="22" cy="-18" r="3.5" fill="#fff"/></g>
+    </g>
+
+    <!-- Papa -->
+    <g transform="translate(285,170) scale(0.85)">
+      <rect x="-15" y="80" width="13" height="18" rx="2" fill="#444441"/><rect x="2" y="80" width="13" height="18" rx="2" fill="#444441"/>
+      <rect id="pull" x="-22" y="40" width="44" height="42" rx="12" fill="#0C447C"/>
+      <line x1="-20" y1="46" x2="-42" y2="62" class="manche" stroke="#0C447C" stroke-width="9" stroke-linecap="round"/><circle cx="-43" cy="63" r="4.5" fill="#F5C4B3"/>
+      <g id="dday" display="none"><line x1="20" y1="46" x2="36" y2="26" class="manche" stroke="#0C447C" stroke-width="9" stroke-linecap="round"/><circle cx="37" cy="23" r="4.5" fill="#F5C4B3"/></g>
+      <g id="dmorning" display="none"><line x1="20" y1="46" x2="27" y2="60" class="manche" stroke="#0C447C" stroke-width="9" stroke-linecap="round"/><rect x="25" y="56" width="11" height="12" rx="2" fill="#D85A30"/><path d="M36 59 q5 3 0 7" stroke="#D85A30" stroke-width="2" fill="none"/><path d="M28 52 q-2 -3 0 -6 M32 52 q-2 -3 0 -6" stroke="#888780" stroke-width="1.2" fill="none"/><circle cx="26" cy="62" r="4.5" fill="#F5C4B3"/></g>
+      <g id="devening" display="none"><line x1="20" y1="46" x2="32" y2="36" class="manche" stroke="#0C447C" stroke-width="9" stroke-linecap="round"/><line x1="33" y1="33" x2="33" y2="14" stroke="#888780" stroke-width="2"/><path d="M30 14 L30 7 M33 14 L33 7 M36 14 L36 7 M30 14 L36 14" stroke="#888780" stroke-width="1.5" fill="none"/><circle cx="33" cy="35" r="4.5" fill="#F5C4B3"/></g>
+      <g id="dnight" display="none"><line x1="20" y1="46" x2="28" y2="72" class="manche" stroke="#0C447C" stroke-width="9" stroke-linecap="round"/><circle cx="28" cy="74" r="4.5" fill="#F5C4B3"/></g>
+      <rect x="-5" y="32" width="10" height="10" fill="#F5C4B3"/>
+      <circle cx="-17" cy="19" r="3.5" fill="#F5C4B3"/><circle cx="17" cy="19" r="3.5" fill="#F5C4B3"/>
+      <ellipse cx="0" cy="18" rx="17" ry="19" fill="#F5C4B3"/>
+      <path d="M-17 14 C-18 -2 -8 -10 0 -10 C4 -14 12 -12 14 -6 C18 0 18 8 17 14 C14 6 8 3 0 4 C-8 4 -13 8 -17 14 Z" fill="#633806"/>
+      <path d="M-17 18 C-17 33 -9 38 0 38 C9 38 17 33 17 18 C14 26 9 29 0 29 C-9 29 -14 26 -17 18 Z" fill="#633806"/>
+      <path d="M-9 11 L-3 10 M3 10 L9 11" stroke="#633806" stroke-width="1.6"/>
+      <g id="dopen"><circle cx="-6" cy="16" r="1.8" fill="#2C2C2A"/><circle cx="6" cy="16" r="1.8" fill="#2C2C2A"/></g>
+      <path id="dclosed" display="none" d="M-8 16 Q-6 18 -4 16 M4 16 Q6 18 8 16" stroke="#2C2C2A" stroke-width="1.4" fill="none"/>
+      <path d="M-6 28 Q0 34 6 28 Z" fill="#fff"/>
+      <g id="dcap" display="none"><path d="M-17 8 L17 8 C15 -6 9 -14 26 -22 C2 -20 -14 -10 -17 8 Z" fill="#534AB7"/><rect x="-18" y="5" width="36" height="6" rx="3" fill="#fff"/><circle cx="26" cy="-22" r="4" fill="#fff"/></g>
+    </g>
+
+    <g id="zzz" display="none" stroke="#E6F1FB" stroke-width="1.5" fill="none"><path d="M314 172 L322 172 L314 180 L322 180"/><path d="M326 160 L332 160 L326 166 L332 166"/><path d="M336 150 L340 150 L336 154 L340 154"/></g>
+  </svg>
+</main>
+
+<script>
+  // Adresse affichée : assemblée ici pour compliquer la vie des robots spammeurs
+  const UTILISATEUR = 'bonjour';
+  const DOMAINE = 'delatte.lu';
+
+  const P = {
+    matin:{pu:'#0C447C',ma:'#0C447C',sky:'#FAECE7',h0:'#C0DD97',pf:'#97C459',h1:'#97C459',pm:'#3B6D11',h2:'#639922',po:'#3B6D11',rv:'#B5D4F4',sun:'#EF9F27',t1:'#4A1B0C',t2:'#993C1D',gl:'#FAC775',cA:'#BA7517',cB:'#854F0B',bB:'#D3D1C7',pb:'#fff',pbd:'#F0997B',pc:'#712B13',g:'Gudde Moien\u202F!',s:'Les sangliers rentrent, les Delatte émergent.'},
+    jour:{pu:'#0C447C',ma:'#0C447C',sky:'#E6F1FB',h0:'#C0DD97',pf:'#97C459',h1:'#97C459',pm:'#3B6D11',h2:'#639922',po:'#3B6D11',rv:'#85B7EB',sun:'#FAC775',t1:'#042C53',t2:'#0C447C',gl:'#444441',cA:'#BA7517',cB:'#854F0B',bB:'#D3D1C7',pb:'#fff',pbd:'#85B7EB',pc:'#0C447C',g:'Moien\u202F!',s:'Vous êtes bien chez les Delatte.'},
+    soir:{pu:'#0C447C',ma:'#0C447C',sky:'#F5C4B3',h0:'#97C459',pf:'#639922',h1:'#639922',pm:'#27500A',h2:'#3B6D11',po:'#27500A',rv:'#F0997B',sun:'#D85A30',t1:'#4A1B0C',t2:'#712B13',gl:'#FAC775',cA:'#BA7517',cB:'#854F0B',bB:'#D3D1C7',pb:'#fff',pbd:'#F0997B',pc:'#712B13',g:'Gudden Owend\u202F!',s:'Les sangliers sortent, les Delatte passent à table.'},
+    nuit:{pu:'url(#pyj)',ma:'#B5D4F4',sky:'#042C53',h0:'#185FA5',pf:'#0C447C',h1:'#0C447C',pm:'#042C53',h2:'#042C53',po:'#0F6E56',rv:'#378ADD',sun:'#FAC775',t1:'#E6F1FB',t2:'#85B7EB',gl:'#FAC775',cA:'#854F0B',cB:'#633806',bB:'#5F5E5A',pb:'transparent',pbd:'#378ADD',pc:'#E6F1FB',g:'Gutt Nuecht…',s:'Il n\'y a rien à voir ici, mais tout à écrire.'}
+  };
+
+  const $ = id => document.getElementById(id);
+  const show = (id, on) => $(id).setAttribute('display', on ? 'inline' : 'none');
+
+  function periode(h){
+    if (h >= 6 && h < 11) return 'matin';
+    if (h >= 11 && h < 18) return 'jour';
+    if (h >= 18 && h < 22) return 'soir';
+    return 'nuit';
+  }
+
+  // Heure belge, ou heure forcée via ?h=22 pour tester
+  function heure(){
+    const q = new URLSearchParams(location.search).get('h');
+    if (q !== null && !isNaN(parseFloat(q))) return Math.min(23.99, Math.max(0, parseFloat(q)));
+    const parts = new Intl.DateTimeFormat('fr-BE', {hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Europe/Brussels'}).formatToParts(new Date());
+    const get = t => parseInt(parts.find(p => p.type === t).value, 10);
+    return (get('hour') % 24) + get('minute') / 60;
+  }
+
+  // Cadrage : vue large sur ordinateur, zoom sur la famille et la maison en portrait
+  const paysage = document.querySelector('.paysage');
+  const intro = document.querySelector('.intro');
+  const portrait = window.matchMedia('(max-aspect-ratio: 1/1)');
+  const HORIZON = 215;   // y où le soleil se couche derrière les collines
+  let L;
+
+  function cadrage(){
+    L = portrait.matches
+      ? {vb:'195 15 400 275', sx0:360, sx1:570, lune:560, sanglier:'translate(572,259) scale(0.8)'}
+      : {vb:'0 0 680 290',   sx0:340, sx1:640, lune:600, sanglier:'translate(605,257) scale(0.8)'};
+    paysage.setAttribute('viewBox', L.vb);
+    $('boar').setAttribute('transform', L.sanglier);
+
+    // Ciel réellement visible, converti en unités du dessin : le haut de l'écran
+    // (ou le bas du texte en portrait) devient une coordonnée y du SVG.
+    const [, vy, , vh] = L.vb.split(' ').map(Number);
+    const box = paysage.getBoundingClientRect();
+    const parPx = vh / box.height;
+    const plafondPx = portrait.matches ? intro.getBoundingClientRect().bottom + 16 : 16;
+    const plafond = vy + (plafondPx - box.top) * parPx;
+
+    if (portrait.matches) {
+      // Mobile : on profite du grand ciel vide sous le texte
+      const ciel = 170 - plafond;
+      L.zenith = plafond + Math.max(28, ciel * 0.3);
+      L.luneY  = plafond + Math.max(26, ciel * 0.22);
+    } else {
+      // Écran large et bas : on abaisse l'arc pour ne pas couper le soleil ni la lune
+      L.zenith = Math.max(45, plafond + 28);
+      L.luneY  = Math.max(60, plafond + 26);
+    }
+    render();
+  }
+
+  function render(){
+    const h = heure(), k = periode(Math.floor(h)), c = P[k], nuit = k === 'nuit';
+    $('scene').style.backgroundColor = c.sky;
+    document.querySelector('meta[name=theme-color]').setAttribute('content', c.sky);
+    ['h0','pf','h1','pm','h2','po','cA','cB','bB'].forEach(id => $(id).setAttribute('fill', c[id]));
+    $('river').setAttribute('stroke', c.rv);
+    document.querySelectorAll('.gl').forEach(e => e.setAttribute('fill', c.gl));
+    $('stars').style.opacity = nuit ? 1 : 0;
+
+    const sun = $('sun'), ms = $('moonshade');
+    sun.setAttribute('fill', c.sun);
+    if (nuit) {
+      sun.setAttribute('cx', L.lune); sun.setAttribute('cy', Math.round(L.luneY)); sun.setAttribute('r', 22);
+      ms.setAttribute('cx', L.lune + 10); ms.setAttribute('cy', Math.round(L.luneY) - 6);
+      ms.setAttribute('opacity', 1); ms.setAttribute('fill', c.sky);
+    } else {
+      const t = (h - 6) / 15;
+      sun.setAttribute('cx', Math.round(L.sx0 + (L.sx1 - L.sx0) * t));
+      sun.setAttribute('cy', Math.round(HORIZON - Math.sin(Math.PI * t) * (HORIZON - L.zenith)));
+      sun.setAttribute('r', 24); ms.setAttribute('opacity', 0);
+    }
+
+    // Papa passe en pyjama rayé la nuit (son pull bleu se fondait dans la colline)
+    $('pull').setAttribute('fill', c.pu);
+    document.querySelectorAll('.manche').forEach(e => e.setAttribute('stroke', c.ma));
+
+    show('dmorning', k === 'matin'); show('dday', k === 'jour'); show('devening', k === 'soir'); show('dnight', nuit);
+    show('kwave', k === 'jour'); show('kdown', k !== 'jour');
+    show('boar', k === 'matin' || k === 'soir');
+    ['dcap','kcap','dclosed','kclosed','zzz'].forEach(id => show(id, nuit));
+    ['dopen','kopen'].forEach(id => show(id, !nuit));
+
+    $('greet').textContent = c.g; $('greet').style.color = c.t1;
+    $('sub').textContent = c.s; $('sub').style.color = c.t2;
+    const m = $('mail');
+    m.style.background = c.pb; m.style.borderColor = c.pbd; m.style.color = c.pc;
+  }
+
+  // Ciel étoilé
+  const champ = $('stars');
+  for (let i = 0; i < 70; i++) {
+    const s = document.createElement('span');
+    const r = Math.random() < 0.2 ? 3 : 2;
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*65}%;width:${r}px;height:${r}px`;
+    champ.appendChild(s);
+  }
+
+  // Adresse e-mail
+  $('mail').href = 'mailto:' + UTILISATEUR + '@' + DOMAINE;
+  $('mailtxt').textContent = UTILISATEUR + '@' + DOMAINE;
+
+  // C'est parti
+  let attente = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(attente);
+    attente = requestAnimationFrame(cadrage);
+  });
+  cadrage();
+  // Les fondus ne s'activent qu'une fois la bonne période affichée
+  requestAnimationFrame(() => requestAnimationFrame(() => $('scene').classList.add('pret')));
+  setInterval(render, 60000);
+</script>
+</body>
+</html>
