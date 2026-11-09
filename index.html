@@ -34,6 +34,35 @@
   .mail{display:inline-flex;align-items:center;gap:.5rem;min-height:44px;padding:.55rem 1.2rem;border-radius:999px;border:1px solid;text-decoration:none;font-size:1rem;transition:transform .15s}
   .mail:hover{transform:translateY(-1px)}
   .mail svg{width:1.1em;height:1.1em}
+
+  /* Panneau de don Ko-fi : s'ouvre par-dessus la carte postale au lieu de quitter le site */
+  .don{border:0;padding:0;margin:auto;width:min(440px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 24px);
+    border-radius:20px;overflow:hidden;background:#FAFAFA;color:#0C447C;font-family:inherit;
+    box-shadow:0 24px 60px rgba(4,44,83,.35)}
+  .don[open]{display:flex;flex-direction:column;animation:donIn .22s ease-out}
+  .don::backdrop{background:rgba(4,44,83,.45);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  @keyframes donIn{from{opacity:0;transform:translateY(12px) scale(.98)}}
+  @keyframes donUp{from{transform:translateY(100%)}}
+  .don-tete{display:flex;align-items:center;gap:.75rem;padding:.9rem .6rem .9rem 1.25rem;flex:none}
+  .don-tete svg{width:1.7rem;height:1.7rem;flex:none}
+  .don-titre{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:400;font-size:1.5rem;line-height:1.1}
+  .don-sous{font-size:.9rem;margin-top:.2rem}
+  .don-fermer{margin-left:auto;flex:none;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:inherit;
+    font-size:1.7rem;line-height:1;cursor:pointer}
+  .don-fermer:hover,.don-fermer:focus-visible{background:color-mix(in srgb,currentColor 12%,transparent)}
+  .don-corps{position:relative;flex:none;height:min(560px,calc(100dvh - 170px))}
+  .don-attente{position:absolute;inset:0;display:grid;place-items:center;color:#5F5E5A;font-size:.95rem}
+  .don iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#FAFAFA;opacity:0;transition:opacity .3s}
+  .don iframe.charge{opacity:1}
+  .don-pied{flex:none;padding:.55rem 1rem calc(.65rem + env(safe-area-inset-bottom));text-align:center;font-size:.85rem;color:#5F5E5A}
+  .don-pied a{color:inherit}
+  /* Téléphone : le panneau monte du bas de l'écran */
+  @media (max-width:600px){
+    .don{width:100%;margin:auto 0 0;border-radius:20px 20px 0 0;max-height:94dvh}
+    .don[open]{animation:donUp .25s ease-out}
+    .don-corps{height:auto;flex:1;min-height:min(540px,calc(94dvh - 160px))}
+  }
+  @media (prefers-reduced-motion:reduce){.don[open]{animation:none}}
 </style>
 </head>
 <body>
@@ -155,6 +184,22 @@
   </svg>
 </main>
 <!-- Bandes fixes invisibles : donnent à Safari la couleur du ciel (haut) et du sol (bas) -->
+<dialog class="don" id="don" aria-labelledby="donTitre">
+  <div class="don-tete" id="donTete">
+    <svg id="donIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+    <div>
+      <h2 class="don-titre" id="donTitre">Offrir un café</h2>
+      <p class="don-sous" id="donSous"></p>
+    </div>
+    <button class="don-fermer" id="donFermer" type="button" aria-label="Fermer">&times;</button>
+  </div>
+  <div class="don-corps">
+    <p class="don-attente" id="donAttente">Chargement…</p>
+    <iframe id="donCadre" title="Faire un don via Ko-fi"></iframe>
+  </div>
+  <p class="don-pied">Paiement géré par Ko-fi · <a id="donLien" href="#" target="_blank" rel="noopener">ouvrir dans un nouvel onglet</a></p>
+</dialog>
+
 <div class="bord haut" id="bordHaut" aria-hidden="true"></div>
 <div class="bord bas" id="bordBas" aria-hidden="true"></div>
 
@@ -162,14 +207,15 @@
   // Adresse affichée : assemblée ici pour compliquer la vie des robots spammeurs
   const UTILISATEUR = 'bonjour';
   const DOMAINE = 'delatte.lu';
-  // Lien de don Ko-fi
+  // Lien de don Ko-fi, et son panneau à intégrer (code fourni par Ko-fi)
   const DON = 'https://ko-fi.com/delatte';
+  const PANNEAU_KOFI = 'https://ko-fi.com/delatte/?hidefeed=true&widget=true&embed=true&preview=true';
 
   // Une boisson par moment de la journée, comme les accessoires de papa
   const BOISSON = {
-    cafe:   {txt:'Offrir un café',   ico:'<path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5c-1 1 1 2 0 3.5M12 3.5c-1 1 1 2 0 3.5"/>'},
-    biere:  {txt:'Offrir une bière', ico:'<path d="M5 8h10v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M15 11h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/><path d="M5 8a2.5 2.5 0 0 1 2.5-3 3 3 0 0 1 5 0A2.5 2.5 0 0 1 15 8"/><path d="M8.5 12v5M11.5 12v5"/>'},
-    tisane: {txt:'Offrir une tisane', ico:'<path d="M4 10h12v4a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 11.5h1.5a2.3 2.3 0 0 1 0 4.6H16"/><path d="M10 13V6"/><rect x="8.6" y="3" width="2.8" height="3" rx=".6"/>'}
+    cafe:   {txt:'Offrir un café',   merci:'De quoi tenir jusqu\'à midi. Merci villmools !', ico:'<path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5c-1 1 1 2 0 3.5M12 3.5c-1 1 1 2 0 3.5"/>'},
+    biere:  {txt:'Offrir une bière', merci:'Santé, et merci villmools !', ico:'<path d="M5 8h10v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M15 11h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/><path d="M5 8a2.5 2.5 0 0 1 2.5-3 3 3 0 0 1 5 0A2.5 2.5 0 0 1 15 8"/><path d="M8.5 12v5M11.5 12v5"/>'},
+    tisane: {txt:'Offrir une tisane', merci:'De quoi bien dormir. Merci villmools !', ico:'<path d="M4 10h12v4a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 11.5h1.5a2.3 2.3 0 0 1 0 4.6H16"/><path d="M10 13V6"/><rect x="8.6" y="3" width="2.8" height="3" rx=".6"/>'}
   };
   const BOISSON_PAR_PERIODE = {matin:'cafe', jour:'cafe', soir:'biere', nuit:'tisane'};
 
@@ -277,6 +323,11 @@
     const b = BOISSON[BOISSON_PAR_PERIODE[k]], cf = $('cafe');
     $('cafetxt').textContent = b.txt; $('cafeico').innerHTML = b.ico;
     cf.style.background = c.pb; cf.style.borderColor = c.pbd; cf.style.color = c.pc;
+    // L'en-tête du panneau de don prend le ciel du moment
+    const tete = $('donTete');
+    tete.style.background = c.sky; tete.style.color = c.t1;
+    $('donIco').innerHTML = b.ico; $('donTitre').textContent = b.txt;
+    $('donSous').textContent = b.merci; $('donSous').style.color = c.t2;
   }
 
   // Ciel étoilé
@@ -292,6 +343,25 @@
   $('mail').href = 'mailto:' + UTILISATEUR + '@' + DOMAINE;
   $('mailtxt').textContent = UTILISATEUR + '@' + DOMAINE;
   $('cafe').href = DON;
+  $('donLien').href = DON;
+
+  // Panneau de don : Ko-fi n'est chargé qu'au premier clic. Sans <dialog>, le lien
+  // ouvre simplement la page Ko-fi dans un nouvel onglet.
+  const don = $('don'), cadre = $('donCadre');
+  cadre.addEventListener('load', () => {
+    if (!cadre.getAttribute('src')) return;
+    cadre.classList.add('charge'); $('donAttente').hidden = true;
+  });
+  if (typeof don.showModal === 'function') {
+    $('cafe').addEventListener('click', e => {
+      e.preventDefault();
+      if (!cadre.getAttribute('src')) cadre.src = PANNEAU_KOFI;
+      don.showModal();
+    });
+    $('donFermer').addEventListener('click', () => don.close());
+    // Un clic sur le fond assombri ferme aussi le panneau
+    don.addEventListener('click', e => { if (e.target === don) don.close(); });
+  }
 
   // C'est parti
   let attente = 0;
