@@ -48,7 +48,47 @@
     50%{transform:translate3d(-6px,52vh,0) rotate(200deg)}75%{transform:translate3d(20px,78vh,0) rotate(300deg)}100%{transform:translate3d(0,105vh,0) rotate(400deg)}}
   .paysage .bulb{animation:scintille 1.8s ease-in-out infinite alternate}
   @keyframes scintille{from{opacity:1}to{opacity:.35}}
-  @media (prefers-reduced-motion:reduce){.meteo{display:none!important}.paysage .bulb{animation:none}}
+
+  /* Météo réelle de Louftémont (Open-Meteo) : nuages, pluie, brouillard, orage */
+  .nuages{position:absolute;left:0;right:0;top:0;height:45%;pointer-events:none;overflow:hidden;z-index:1}
+  .nuage{position:absolute;left:0;display:none;animation:derive linear infinite}
+  .nuage svg{display:block;width:100%;height:auto}
+  .nuage path{fill:var(--nuage,#fff)}
+  @keyframes derive{from{transform:translateX(-30vw)}to{transform:translateX(115vw)}}
+  body.gris .paysage{filter:saturate(.72) brightness(.96)}
+  body.meteo-pluie .pluie,body.meteo-orage .pluie,body.meteo-bruine .pluie{display:block}
+  body.meteo-bruine .pluie i:nth-child(n+41){display:none}
+  body.meteo-neige .neige{display:block}
+  body.meteo-neige .feuilles{display:none}
+  body.meteo-pluie .neige,body.meteo-orage .neige,body.meteo-bruine .neige{display:none}
+  body.meteo-orage .eclair{display:block}
+  .pluie i{position:absolute;top:-24px;width:2px;height:20px;border-radius:1px;background:linear-gradient(rgba(70,95,125,0),rgba(70,95,125,.7));animation:pluie linear infinite}
+  body.nuit .pluie i{background:linear-gradient(rgba(181,212,244,0),rgba(181,212,244,.6))}
+  @keyframes pluie{to{transform:translate3d(-36px,105vh,0)}}
+  .eclair{background:#fff;opacity:0;animation:eclair 11s infinite}
+  @keyframes eclair{0%,88%,92%,100%{opacity:0}89%{opacity:.3}90%{opacity:0}91%{opacity:.2}}
+  .brume-a{animation:brume 60s ease-in-out infinite alternate}
+  .brume-b{animation:brume 85s ease-in-out infinite alternate-reverse}
+  @keyframes brume{from{transform:translateX(-30px)}to{transform:translateX(30px)}}
+  body.nuit #brume,body.nuit #brume2{opacity:.35}
+
+  /* Petits secrets au clic : le sanglier détale, Hugo fait coucou, les lumières, les étoiles filantes */
+  #boar,#fiston,#maison{cursor:pointer}
+  .sanglier-corps{transform-box:fill-box;transform-origin:50% 100%}
+  .fuite .sanglier-corps{animation:fuite 1.5s ease-in forwards}
+  @keyframes fuite{0%{transform:scale(-1,1)}15%{transform:scale(-1,1) translate(-12px,-7px)}30%{transform:scale(-1,1) translate(-34px,0)}
+    45%{transform:scale(-1,1) translate(-62px,-7px)}60%{transform:scale(-1,1) translate(-96px,0)}75%{transform:scale(-1,1) translate(-136px,-7px)}100%{transform:scale(-1,1) translate(-240px,0)}}
+  .retour .sanglier-corps{animation:retour .8s ease-out}
+  @keyframes retour{from{opacity:0}}
+  .filante{position:absolute;width:90px;height:2px;border-radius:2px;pointer-events:none;z-index:1;
+    background:linear-gradient(90deg,#fff,rgba(255,255,255,0));transform-origin:0 50%;animation:filante 1.1s ease-out forwards}
+  @keyframes filante{0%{opacity:0;transform:rotate(-30deg) translateX(0) scaleX(.3)}15%{opacity:1}100%{opacity:0;transform:rotate(-30deg) translateX(-170px) scaleX(1)}}
+
+  @media (prefers-reduced-motion:reduce){
+    .meteo{display:none!important}.paysage .bulb{animation:none}
+    .nuage{animation:none;left:var(--x)}.brume-a,.brume-b{animation:none}
+    .fuite .sanglier-corps,.retour .sanglier-corps{animation:none}.filante{display:none}
+  }
 
   /* Panneau de don Ko-fi : s'ouvre par-dessus la carte postale au lieu de quitter le site */
   .don{border:0;padding:0;margin:auto;width:min(440px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 24px);
@@ -83,8 +123,11 @@
 <body>
 <main class="scene" id="scene">
   <div class="stars" id="stars"></div>
+  <div class="nuages" id="nuages" aria-hidden="true"></div>
   <div class="meteo neige" id="neige" aria-hidden="true"></div>
   <div class="meteo feuilles" id="feuilles" aria-hidden="true"></div>
+  <div class="meteo pluie" id="pluie" aria-hidden="true"></div>
+  <div class="meteo eclair" aria-hidden="true"></div>
 
   <div class="intro">
     <h1 id="greet" lang="lb">Moien&#8239;!</h1>
@@ -107,12 +150,14 @@
       <g id="oak"><rect x="-2" y="-10" width="4" height="12" fill="#633806"/><circle cx="0" cy="-20" r="13"/></g>
       <pattern id="clad" width="4" height="10" patternUnits="userSpaceOnUse"><rect id="cA" width="4" height="10" fill="#BA7517"/><rect id="cB" x="3.3" width="0.7" height="10" fill="#854F0B"/></pattern>
       <pattern id="batt" width="8" height="10" patternUnits="userSpaceOnUse"><rect width="8" height="10" fill="#2C2C2A"/><rect id="bB" width="1.6" height="10" fill="#D3D1C7"/></pattern>
+      <radialGradient id="nappe"><stop offset="0" stop-color="#F1F4F6" stop-opacity=".85"/><stop offset="1" stop-color="#F1F4F6" stop-opacity="0"/></radialGradient>
+      <linearGradient id="voileBrume" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F1F4F6" stop-opacity="0"/><stop offset=".55" stop-color="#F1F4F6" stop-opacity=".8"/><stop offset="1" stop-color="#F1F4F6" stop-opacity="0"/></linearGradient>
       <pattern id="pyj" width="7" height="10" patternUnits="userSpaceOnUse"><rect width="7" height="10" fill="#B5D4F4"/><rect width="2.5" height="10" fill="#85B7EB"/></pattern>
     </defs>
 
-    <!-- Soleil / lune -->
+    <!-- Soleil, et lune avec sa vraie phase -->
     <circle id="sun" cx="520" cy="60" r="24" fill="#FAC775"/>
-    <circle id="moonshade" cx="610" cy="54" r="20" fill="#042C53" opacity="0"/>
+    <g id="lune" display="none"><circle id="luneSombre" r="22" fill="#0C447C" opacity=".55"/><path id="luneClaire" fill="#FAC775"/></g>
 
     <!-- Collines et forêts -->
     <path id="h0" d="M0 178 C100 155 200 162 300 172 C420 184 520 142 680 158 L680 290 L0 290 Z" fill="#C0DD97"/>
@@ -124,12 +169,19 @@
       <use href="#pine" transform="translate(15,218) scale(0.8)"/><use href="#pine" transform="translate(38,214) scale(0.75)"/><use href="#pine" transform="translate(62,210) scale(0.85)"/><use href="#pine" transform="translate(88,206) scale(0.75)"/><use href="#pine" transform="translate(115,204) scale(0.8)"/><use href="#pine" transform="translate(150,204) scale(0.7)"/>
       <use href="#pine" transform="translate(545,204) scale(0.85)"/><use href="#pine" transform="translate(570,202) scale(0.75)"/><use href="#pine" transform="translate(592,201) scale(0.85)"/><use href="#pine" transform="translate(615,200) scale(0.7)"/><use href="#pine" transform="translate(636,200) scale(0.8)"/><use href="#pine" transform="translate(656,200) scale(0.75)"/><use href="#pine" transform="translate(676,201) scale(0.85)"/>
     </g>
+    <!-- Brouillard (météo réelle) : nappes qui traînent dans la vallée -->
+    <g id="brume" display="none">
+      <rect x="-60" y="148" width="800" height="90" fill="url(#voileBrume)"/>
+      <g class="brume-a"><ellipse cx="120" cy="200" rx="170" ry="26" fill="url(#nappe)"/><ellipse cx="520" cy="186" rx="190" ry="24" fill="url(#nappe)"/></g>
+      <g class="brume-b"><ellipse cx="330" cy="212" rx="200" ry="22" fill="url(#nappe)"/><ellipse cx="700" cy="205" rx="150" ry="20" fill="url(#nappe)"/></g>
+    </g>
     <path id="river" d="M690 228 C630 236 600 224 545 234 C495 244 470 236 430 248 C400 257 385 262 365 272" stroke="#85B7EB" stroke-width="8" stroke-linecap="round" fill="none"/>
     <path id="h2" d="M0 262 C150 238 260 252 380 266 C500 280 580 246 680 255 L680 290 L0 290 Z" fill="#639922"/>
+    <g id="brume2" display="none" class="brume-b"><ellipse cx="200" cy="262" rx="260" ry="12" fill="url(#nappe)"/><ellipse cx="600" cy="258" rx="200" ry="11" fill="url(#nappe)"/></g>
     <g id="po" fill="#3B6D11"><use href="#oak" transform="translate(40,258)"/><use href="#oak" transform="translate(650,257)"/><use href="#oak" transform="translate(673,256) scale(0.85)"/></g>
 
-    <!-- La maison -->
-    <g>
+    <!-- La maison (un clic allume ou éteint les lumières) -->
+    <g id="maison">
       <rect x="362" y="226" width="48" height="40" fill="#2C2C2A"/>
       <rect x="364" y="238" width="44" height="28" fill="#2C2C2A" stroke="#444441" stroke-width="0.8"/>
       <path d="M364 245 L408 245 M364 252 L408 252 M364 259 L408 259" stroke="#444441" stroke-width="0.6"/>
@@ -158,15 +210,17 @@
 
     <!-- Le sanglier (matin et soir) -->
     <g id="boar" display="none" transform="translate(605,257) scale(0.8)" fill="#444441">
+      <g class="sanglier-corps">
       <rect x="-11" y="-6" width="4" height="7"/><rect x="-5" y="-6" width="4" height="7"/><rect x="5" y="-6" width="4" height="7"/><rect x="10" y="-6" width="4" height="7"/>
       <ellipse cx="1" cy="-12" rx="16" ry="9"/><path d="M-11 -19 L-26 -11 L-27 -6 L-11 -5 Z"/><rect x="-30" y="-11" width="4" height="5" rx="1"/><path d="M-13 -20 L-10 -26 L-7 -19 Z"/><path d="M16 -15 q5 -2 3 3" stroke="#444441" stroke-width="1.5" fill="none"/><circle cx="-18" cy="-13" r="1.1" fill="#F1EFE8"/><path d="M-24 -7 L-22 -11" stroke="#F1EFE8" stroke-width="1.3"/>
+      </g>
     </g>
 
     <!-- Le fiston, en sweat à capuche. Décalé à 228 pour tenir la main de papa -->
     <g id="fiston" transform="translate(228,195) scale(0.85)">
       <rect x="-11" y="57" width="8" height="15" rx="2" fill="#33383D"/><rect x="-11" y="69.5" width="8" height="3" rx="1.2" fill="#272B2F"/><rect x="-12.8" y="72" width="11" height="4.6" rx="2.2" fill="#EDEBE4"/><rect x="-12.8" y="75.2" width="11" height="1.4" rx=".7" fill="#C9C6BD"/>
       <rect x="3" y="57" width="8" height="15" rx="2" fill="#33383D"/><rect x="3" y="69.5" width="8" height="3" rx="1.2" fill="#272B2F"/><rect x="1.2" y="72" width="11" height="4.6" rx="2.2" fill="#EDEBE4"/><rect x="1.2" y="75.2" width="11" height="1.4" rx=".7" fill="#C9C6BD"/>
-      <g id="kwave" display="none"><line x1="-13" y1="35" x2="-23" y2="19" stroke="#A3B5A0" stroke-width="7" stroke-linecap="round"/><line x1="-20.8" y1="22.5" x2="-23" y2="19" stroke="#8DA08A" stroke-width="7" stroke-linecap="round"/><circle cx="-24.2" cy="17.1" r="3.6" fill="#F5C4B3"/></g>
+      <g id="kwave" display="none"><animateTransform id="agite" attributeName="transform" type="rotate" values="0 -13 35;-14 -13 35;8 -13 35;-14 -13 35;8 -13 35;0 -13 35" dur="1.4s" begin="indefinite"/><line x1="-13" y1="35" x2="-23" y2="19" stroke="#A3B5A0" stroke-width="7" stroke-linecap="round"/><line x1="-20.8" y1="22.5" x2="-23" y2="19" stroke="#8DA08A" stroke-width="7" stroke-linecap="round"/><circle cx="-24.2" cy="17.1" r="3.6" fill="#F5C4B3"/></g>
       <g id="kdown"><line x1="-13" y1="36" x2="-19" y2="54" stroke="#A3B5A0" stroke-width="7" stroke-linecap="round"/><line x1="-17.7" y1="50" x2="-19" y2="54" stroke="#8DA08A" stroke-width="7" stroke-linecap="round"/><circle cx="-19.7" cy="56.2" r="3.6" fill="#F5C4B3"/></g>
       <line x1="13" y1="36" x2="22" y2="36" stroke="#A3B5A0" stroke-width="7" stroke-linecap="round"/><line x1="20" y1="36" x2="22" y2="36" stroke="#8DA08A" stroke-width="7" stroke-linecap="round"/><circle cx="23.1" cy="36" r="3.6" fill="#F5C4B3"/>
       <path d="M-15 34 Q-16 30.5 -11.5 30 L11.5 30 Q16 30.5 15 34 L16 57 Q16 61 12.5 61 L-12.5 61 Q-16 61 -16 57 Z" fill="#A3B5A0"/><rect x="-16" y="57.2" width="32" height="3.8" rx="1.9" fill="#7F927C"/>
@@ -259,13 +313,109 @@
 
   const $ = id => document.getElementById(id);
 
+  // État des petits secrets et de la météo (déclaré avant le premier rendu)
+  let meteo = null, sanglierRevient = 0, coucouJusqua = 0;
+  const lumieres = {etat:null, pour:null, actuel:false};
+  const calme = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // ---- Soleil et lune de Louftémont, calculés dans la page ----
+  const LAT = 49.79, LON = 5.63, RAD = Math.PI / 180;
+  // Équation du lever du soleil : alt = -0,833° pour le lever/coucher, -6° pour l'aube et le crépuscule civils
+  function soleilUTC(an, mois, jour, alt){
+    const n = Math.round(Date.UTC(an, mois - 1, jour, 12) / 86400000 + 2440587.5 - 2451545);
+    const js = n - LON / 360;
+    const M = (357.5291 + 0.98560028 * js) % 360;
+    const C = 1.9148 * Math.sin(M * RAD) + 0.02 * Math.sin(2 * M * RAD) + 0.0003 * Math.sin(3 * M * RAD);
+    const lambda = (M + C + 180 + 102.9372) % 360;
+    const transit = 2451545 + js + 0.0053 * Math.sin(M * RAD) - 0.0069 * Math.sin(2 * lambda * RAD);
+    const dec = Math.asin(Math.sin(lambda * RAD) * Math.sin(23.4397 * RAD));
+    const cw = (Math.sin(alt * RAD) - Math.sin(LAT * RAD) * Math.sin(dec)) / (Math.cos(LAT * RAD) * Math.cos(dec));
+    const w = Math.acos(Math.max(-1, Math.min(1, cw))) / RAD / 360;
+    const date = j => new Date((j - 2440587.5) * 86400000);
+    return {lever:date(transit - w), coucher:date(transit + w)};
+  }
+  function enHeureBelge(d){
+    const parts = new Intl.DateTimeFormat('fr-BE', {hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'Europe/Brussels'}).formatToParts(d);
+    const get = t => parseInt(parts.find(p => p.type === t).value, 10);
+    return (get('hour') % 24) + get('minute') / 60;
+  }
+  let memoSoleil = {};
+  function ephemerides(an, mois, jour){
+    const cle = an + '-' + mois + '-' + jour;
+    if (memoSoleil.cle !== cle) {
+      const s = soleilUTC(an, mois, jour, -0.833), c = soleilUTC(an, mois, jour, -6);
+      memoSoleil = {cle, v:{aube:enHeureBelge(c.lever), lever:enHeureBelge(s.lever), coucher:enHeureBelge(s.coucher), crepuscule:enHeureBelge(c.coucher)}};
+    }
+    return memoSoleil.v;
+  }
+  // Lumière du dehors : nuit après le crépuscule civil, aube rose le matin, couchant le soir
+  function lumiere(h, s){
+    if (h < s.aube || h >= s.crepuscule) return 'nuit';
+    if (h < s.lever + 1.25) return 'matin';
+    if (h >= s.coucher - 1) return 'soir';
+    return 'jour';
+  }
+  // Phase de la lune : 0 = nouvelle lune, 0,5 = pleine lune (mois synodique moyen)
+  function phaseLune(an, mois, jour, h){
+    const t = Date.UTC(an, mois - 1, jour) + (h - 1) * 3600000;
+    const ref = Date.UTC(2000, 0, 6, 18, 14), s = 29.530588853 * 86400000;
+    return (((t - ref) % s) + s) % s / s;
+  }
+  function dessinerLune(cx, cy, r, p){
+    const k = (1 - Math.cos(2 * Math.PI * p)) / 2;          // part éclairée
+    const rx = (r * Math.abs(1 - 2 * k)).toFixed(2), haut = `${cx} ${cy - r}`, bas = `${cx} ${cy + r}`;
+    const d = p < .5   // croissante : éclairée à droite ; décroissante : à gauche
+      ? `M${haut} A${r} ${r} 0 0 1 ${bas} A${rx} ${r} 0 0 ${k < .5 ? 0 : 1} ${haut} Z`
+      : `M${haut} A${r} ${r} 0 0 0 ${bas} A${rx} ${r} 0 0 ${k < .5 ? 1 : 0} ${haut} Z`;
+    $('luneClaire').setAttribute('d', d);
+    $('luneSombre').setAttribute('cx', cx); $('luneSombre').setAttribute('cy', cy);
+  }
+
+  // ---- Météo réelle (Open-Meteo, sans clé), ou forcée via ?meteo=pluie pour tester ----
+  const METEO_URL = 'https://api.open-meteo.com/v1/forecast?latitude=49.79&longitude=5.63&current=weather_code,cloud_cover&timezone=Europe%2FBrussels';
+  const TEMPS = ['clair','voile','nuages','couvert','brouillard','bruine','pluie','neige','orage'];
+  const GRIS = ['couvert','brouillard','bruine','pluie','neige','orage'];
+  const NB_NUAGES = {clair:0, voile:2, nuages:4, couvert:9, brouillard:2, bruine:7, pluie:9, neige:7, orage:9};
+  function typeMeteo(code, couverture){   // codes météo WMO
+    if (code >= 95) return 'orage';
+    if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'neige';
+    if (code >= 51 && code <= 57) return 'bruine';
+    if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return 'pluie';
+    if (code === 45 || code === 48) return 'brouillard';
+    if (code === 3) return 'couvert';
+    if (code === 2) return 'nuages';
+    if (code === 1 || couverture >= 25) return 'voile';
+    return 'clair';
+  }
+  async function chargerMeteo(){
+    const forcee = new URLSearchParams(location.search).get('meteo');
+    if (TEMPS.includes(forcee)) { meteo = forcee; render(); return; }
+    try {
+      const r = await fetch(METEO_URL);
+      if (!r.ok) return;
+      const j = await r.json();
+      meteo = typeMeteo(j.current.weather_code, j.current.cloud_cover);
+      render();
+    } catch (e) { /* hors ligne : on garde le ciel tel quel */ }
+  }
+  function melange(a, b, t){
+    const rgb = x => [1, 3, 5].map(i => parseInt(x.slice(i, i + 2), 16)), A = rgb(a), B = rgb(b);
+    return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  }
+  function couleurNuage(temps, lum){
+    const sombre = temps === 'pluie' || temps === 'orage';
+    if (lum === 'nuit') return sombre ? '#243C58' : '#2F527A';
+    if (sombre) return '#A7B1BC';
+    return GRIS.includes(temps) ? '#E1E6EB' : '#FFFFFF';
+  }
+
   // Date belge, ou date forcée via ?date=2026-12-20 pour tester les saisons
   function calendrier(){
     const q = (new URLSearchParams(location.search).get('date') || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (q) return {mois:+q[2], jour:+q[3]};
-    const parts = new Intl.DateTimeFormat('fr-BE', {month:'numeric', day:'numeric', timeZone:'Europe/Brussels'}).formatToParts(new Date());
+    if (q) return {annee:+q[1], mois:+q[2], jour:+q[3]};
+    const parts = new Intl.DateTimeFormat('fr-BE', {year:'numeric', month:'numeric', day:'numeric', timeZone:'Europe/Brussels'}).formatToParts(new Date());
     const get = t => parseInt(parts.find(p => p.type === t).value, 10);
-    return {mois:get('month'), jour:get('day')};
+    return {annee:get('year'), mois:get('month'), jour:get('day')};
   }
   // Mêmes dates que sur le tableau de bord Home Assistant
   function saison(m, d){
@@ -328,55 +478,77 @@
   }
 
   function render(){
-    const h = heure(), k = periode(Math.floor(h)), c = P[k], nuit = k === 'nuit';
-    $('scene').style.backgroundColor = c.sky;
-    document.querySelector('meta[name=theme-color]').setAttribute('content', c.sky);
+    // k : ce que font les Delatte (selon l'heure) ; lum : la lumière dehors (selon le vrai soleil)
+    const h = heure(), k = periode(Math.floor(h)), dort = k === 'nuit';
+    const {annee, mois, jour} = calendrier(), sol = ephemerides(annee, mois, jour);
+    const lum = lumiere(h, sol), nuit = lum === 'nuit';
+    const a = P[k], c = P[lum];
+    const temps = meteo || 'clair', gris = GRIS.includes(temps);
+    const ciel = gris ? melange(c.sky, nuit ? '#1C2E40' : '#AEB8C2', nuit ? .3 : .45) : c.sky;
+
+    $('scene').style.backgroundColor = ciel;
+    document.querySelector('meta[name=theme-color]').setAttribute('content', ciel);
     // Teinte des barres Safari 26 : ciel en haut, sol en bas
-    document.documentElement.style.backgroundColor = c.sky;
-    $('bordHaut').style.backgroundColor = c.sky;
+    document.documentElement.style.backgroundColor = ciel;
+    $('bordHaut').style.backgroundColor = ciel;
     $('bordBas').style.backgroundColor = c.h2;
     ['h0','pf','h1','pm','h2','po','cA','cB','bB'].forEach(id => $(id).setAttribute('fill', c[id]));
     $('river').setAttribute('stroke', c.rv);
-    document.querySelectorAll('.gl').forEach(e => e.setAttribute('fill', c.gl));
-    $('stars').style.opacity = nuit ? 1 : 0;
+    // Fenêtres : allumées selon la lumière, ou comme on les a laissées d'un clic (jusqu'au prochain changement de lumière)
+    if (lumieres.pour !== lum) { lumieres.etat = null; lumieres.pour = lum; }
+    const allume = lumieres.etat ?? (c.gl === '#FAC775');
+    lumieres.actuel = allume;
+    document.querySelectorAll('.gl').forEach(e => e.setAttribute('fill', allume ? '#FAC775' : '#444441'));
+    $('stars').style.opacity = nuit ? (gris ? .15 : 1) : 0;
 
-    const sun = $('sun'), ms = $('moonshade');
-    sun.setAttribute('fill', c.sun);
+    // Soleil entre son vrai lever et son vrai coucher ; la nuit, la lune avec sa phase du jour
+    const voile = gris ? .35 : 1;
+    show('sun', !nuit); show('lune', nuit);
     if (nuit) {
-      sun.setAttribute('cx', L.lune); sun.setAttribute('cy', Math.round(L.luneY)); sun.setAttribute('r', 22);
-      ms.setAttribute('cx', L.lune + 10); ms.setAttribute('cy', Math.round(L.luneY) - 6);
-      ms.setAttribute('opacity', 1); ms.setAttribute('fill', c.sky);
+      dessinerLune(L.lune, Math.round(L.luneY), 22, phaseLune(annee, mois, jour, h));
+      $('luneClaire').setAttribute('fill', c.sun); $('lune').setAttribute('opacity', voile);
     } else {
-      const t = (h - 6) / 15;
+      const sun = $('sun'), t = Math.min(1.2, Math.max(-.2, (h - sol.lever) / (sol.coucher - sol.lever)));
+      sun.setAttribute('fill', c.sun); sun.setAttribute('opacity', voile);
       sun.setAttribute('cx', Math.round(L.sx0 + (L.sx1 - L.sx0) * t));
       sun.setAttribute('cy', Math.round(HORIZON - Math.sin(Math.PI * t) * (HORIZON - L.zenith)));
-      sun.setAttribute('r', 24); ms.setAttribute('opacity', 0);
     }
 
-    // Papa passe en pyjama rayé la nuit (son pull bleu se fondait dans la colline)
-    $('pull').setAttribute('fill', c.pu);
-    document.querySelectorAll('.manche').forEach(e => e.setAttribute('stroke', c.ma));
+    // Papa en pyjama quand il dort ; s'il fait déjà noir avant, pull plus clair pour ne pas se fondre dans la colline
+    const pull = dort ? a.pu : (nuit ? '#378ADD' : '#0C447C');
+    $('pull').setAttribute('fill', pull);
+    document.querySelectorAll('.manche').forEach(e => e.setAttribute('stroke', dort ? a.ma : pull));
 
-    show('dmorning', k === 'matin'); show('dday', k === 'jour'); show('devening', k === 'soir'); show('dnight', nuit);
-    show('kwave', k === 'jour'); show('kdown', k !== 'jour');
-    show('boar', k === 'matin' || k === 'soir');
-    ['dcap','kcap','dclosed','kclosed','zzz'].forEach(id => show(id, nuit));
-    ['dopen','kopen'].forEach(id => show(id, !nuit));
+    const coucou = Date.now() < coucouJusqua;
+    show('dmorning', k === 'matin'); show('dday', k === 'jour'); show('devening', k === 'soir'); show('dnight', dort);
+    show('kwave', k === 'jour' || coucou); show('kdown', !(k === 'jour' || coucou));
+    show('boar', (k === 'matin' || k === 'soir') && Date.now() > sanglierRevient);
+    ['dcap','kcap','dclosed','zzz'].forEach(id => show(id, dort));
+    show('dopen', !dort); show('kopen', !dort || coucou); show('kclosed', dort && !coucou);
 
     // Saisons : chênes orange et feuilles mortes en automne, arbres en fleurs au printemps,
     // neige, guirlande, sapin et bonnets du 7 décembre au 5 janvier
-    const {mois, jour} = calendrier(), sa = saison(mois, jour);
+    const sa = saison(mois, jour);
     const noel = (mois === 12 && jour >= 7) || (mois === 1 && jour <= 5);
     const corps = document.body.classList;
-    ['printemps','ete','automne','hiver'].forEach(s => corps.toggle('saison-' + s, s === sa));
+    ['printemps','ete','automne','hiver'].forEach(x => corps.toggle('saison-' + x, x === sa));
     corps.toggle('noel', noel); corps.toggle('nuit', nuit);
     if (sa === 'automne') $('po').setAttribute('fill', nuit ? '#5A3415' : '#D9822B');
     show('s-printemps', sa === 'printemps'); $('s-printemps').setAttribute('opacity', nuit ? .45 : 1);
     show('s-noel', noel); show('kxmas', noel); show('dxmas', noel);
     if (noel) { show('kcap', false); show('dcap', false); }
 
-    $('greet').textContent = c.g; $('greet').style.color = c.t1;
-    $('sub').textContent = c.s; $('sub').style.color = c.t2;
+    // Météo : nuages, ciel gris, pluie, neige, brouillard, orage
+    TEMPS.forEach(x => corps.toggle('meteo-' + x, x === temps));
+    show('brume', temps === 'brouillard'); show('brume2', temps === 'brouillard');
+    corps.toggle('gris', gris);
+    const nuages = $('nuages'), nb = NB_NUAGES[temps];
+    nuages.style.setProperty('--nuage', couleurNuage(temps, lum));
+    nuages.style.opacity = nuit ? .85 : 1;
+    [...nuages.children].forEach((n, i) => { n.style.display = i < nb ? 'block' : 'none'; });
+
+    $('greet').textContent = a.g; $('greet').style.color = c.t1;
+    $('sub').textContent = a.s; $('sub').style.color = c.t2;
     const m = $('mail');
     m.style.background = c.pb; m.style.borderColor = c.pbd; m.style.color = c.pc;
     const b = BOISSON[BOISSON_PAR_PERIODE[k]], cf = $('cafe');
@@ -384,7 +556,7 @@
     cf.style.background = c.pb; cf.style.borderColor = c.pbd; cf.style.color = c.pc;
     // L'en-tête du panneau de don prend le ciel du moment
     const tete = $('donTete');
-    tete.style.background = c.sky; tete.style.color = c.t1;
+    tete.style.background = ciel; tete.style.color = c.t1;
     $('donIco').innerHTML = b.ico; $('donTitre').textContent = b.txt;
     $('donSous').textContent = b.merci; $('donSous').style.color = c.t2;
   }
@@ -412,6 +584,65 @@
     f.style.cssText = `left:${(hasard()*100).toFixed(1)}%;background:${TEINTES[i % 4]};animation-duration:${d.toFixed(1)}s;animation-delay:-${(hasard()*d).toFixed(1)}s`;
     $('feuilles').appendChild(f);
   }
+
+  // Nuages qui dérivent lentement, et gouttes de pluie
+  const NUAGE = '<svg viewBox="0 0 120 50"><path d="M20 46C6 46 3 31 15 28C13 16 29 10 37 18C43 4 67 3 73 18C81 10 99 13 99 27C113 27 117 46 103 46Z"/></svg>';
+  for (let i = 0; i < 10; i++) {
+    // Répartis au nombre d'or : quel que soit le nombre de nuages affichés, ils restent étalés dans le ciel
+    const n = document.createElement('div'), f = .75 + hasard() * .7, d = 120 + hasard() * 80, ou = (i * .618) % 1;
+    n.className = 'nuage'; n.innerHTML = NUAGE;
+    n.style.cssText = `top:${(2 + hasard() * 53).toFixed(1)}%;width:calc(${f.toFixed(2)} * clamp(110px, 16vw, 240px));animation-duration:${d.toFixed(0)}s;animation-delay:-${(ou * d).toFixed(0)}s;--x:${(ou * 85).toFixed(0)}%`;
+    $('nuages').appendChild(n);
+  }
+  for (let i = 0; i < 120; i++) {
+    const g = document.createElement('i'), d = .55 + hasard() * .45;
+    g.style.cssText = `left:${(hasard() * 104).toFixed(1)}%;animation-duration:${d.toFixed(2)}s;animation-delay:-${(hasard() * d).toFixed(2)}s`;
+    $('pluie').appendChild(g);
+  }
+
+  // Petits secrets : le sanglier détale, Hugo fait coucou, les lumières de la maison
+  paysage.addEventListener('click', e => {
+    if (e.target.closest('#boar')) {
+      const b = $('boar');
+      if (b.classList.contains('fuite')) return;
+      b.classList.add('fuite');
+      setTimeout(() => {
+        sanglierRevient = Date.now() + 12000; b.classList.remove('fuite'); render();
+        setTimeout(() => { b.classList.add('retour'); render(); setTimeout(() => b.classList.remove('retour'), 900); }, 12100);
+      }, calme.matches ? 300 : 1500);
+    } else if (e.target.closest('#fiston')) {
+      coucouJusqua = Date.now() + 2600; render();
+      const anim = $('agite');
+      if (!calme.matches && anim && anim.beginElement) anim.beginElement();
+      setTimeout(render, 2700);
+    } else if (e.target.closest('#maison')) {
+      lumieres.etat = !lumieres.actuel; render();
+    }
+  });
+  // La nuit, un clic dans le ciel fait passer une étoile filante (et parfois, il en passe une toute seule)
+  function etoileFilante(x, y){
+    if (calme.matches) return;
+    const s = document.createElement('span');
+    s.className = 'filante'; s.style.left = x + 'px'; s.style.top = y + 'px';
+    $('scene').appendChild(s);
+    s.addEventListener('animationend', () => s.remove());
+  }
+  const cielDegage = () => document.body.classList.contains('nuit') && !document.body.classList.contains('gris');
+  $('scene').addEventListener('click', e => {
+    if (!cielDegage()) return;
+    if (e.target !== $('scene') && e.target !== paysage && !e.target.closest('.stars')) return;
+    const r = $('scene').getBoundingClientRect();
+    etoileFilante(e.clientX - r.left, e.clientY - r.top);
+  });
+  (function filanteAuHasard(){
+    setTimeout(() => {
+      if (cielDegage() && !document.hidden) {
+        const r = $('scene').getBoundingClientRect();
+        etoileFilante(r.width * (.3 + Math.random() * .65), r.height * (.05 + Math.random() * .3));
+      }
+      filanteAuHasard();
+    }, 25000 + Math.random() * 45000);
+  })();
 
   // Adresse e-mail
   $('mail').href = 'mailto:' + UTILISATEUR + '@' + DOMAINE;
@@ -447,6 +678,8 @@
   // Les fondus ne s'activent qu'une fois la bonne période affichée
   requestAnimationFrame(() => requestAnimationFrame(() => $('scene').classList.add('pret')));
   setInterval(render, 60000);
+  chargerMeteo();
+  setInterval(chargerMeteo, 15 * 60000);
 </script>
 </body>
 </html>
